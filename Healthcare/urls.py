@@ -27,8 +27,9 @@ urlpatterns = [
         name='state_list'
     ),
     url(
-        r'^api/v1/states/(?P<pk>[0-9]+)$',
+        r'^api/v1/states/(?P<id>[0-9]+)$',
         views_state.state_detail,
         name='state_detail'
     ),
+
 ]

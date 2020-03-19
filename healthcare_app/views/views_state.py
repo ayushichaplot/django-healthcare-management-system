@@ -1,5 +1,7 @@
+from django.core.validators import RegexValidator
 from django.shortcuts import render
 from rest_framework.decorators import api_view
+from rest_framework.exceptions import ValidationError, APIException
 from rest_framework.response import Response
 from rest_framework import status
 from ..models import State
@@ -7,9 +9,9 @@ from ..serilaizers import StateSerializer
 
 
 @api_view(['GET', 'DELETE', 'PUT'])
-def state_detail(request, pk):
+def state_detail(request, id):
     try:
-        state = State.objects.get(pk=pk)
+        state = State.objects.get(id=id)
     except State.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -25,10 +27,16 @@ def state_detail(request, pk):
 
     # update details of a single state
     elif request.method == 'PUT':
-        serializer = StateSerializer(state, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
+        serializer = StateSerializer(state, data=request.data, context={'request': request})
+        try:
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
+        except ValidationError as e:
+            if e.detail.get('name') == ['state with this name already exists.']:
+                raise Custom409()
+            elif e.detail.get('name') == ['Name should only consist of characters']:
+                raise Custom422()
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -43,7 +51,26 @@ def state_list(request):
     # insert a new record for a state
     elif request.method == 'POST':
         serializer = StateSerializer(data=request.data)
-        if serializer.is_valid():
+        try:
+            serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        except ValidationError as e:
+            if e.detail.get('name') == ['state with this name already exists.']:
+                raise Custom409()
+            elif e.detail.get('name') == ['Name should only consist of characters']:
+                raise Custom422()
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class Custom409(APIException):
+    status_code = status.HTTP_409_CONFLICT
+    default_detail = "State already there."
+
+
+class Custom422(APIException):
+    status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+    default_detail = "State name should have characters only."
+
+

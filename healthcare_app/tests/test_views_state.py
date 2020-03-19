@@ -56,6 +56,12 @@ class CreateNewStateTest(TestCase):
         self.invalid_payload = {
             'name': '',
         }
+        self.invalid_payload1 = {
+            'name': "123",
+        }
+        self.valid_payload = {
+            'name': 'Rajasthan'
+        }
 
     def test_create_valid_state(self):
         response = client.post(reverse('state_list'),
@@ -71,6 +77,24 @@ class CreateNewStateTest(TestCase):
                                )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_create_invalid_state_name(self):
+        response = client.post(reverse('state_list'),
+                               data=json.dumps(self.invalid_payload1),
+                               content_type='application/json'
+                               )
+        self.assertEqual(response.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
+
+    def test_if_multiple_state_name(self):
+        create_state = self.client.post(reverse('state_list'),
+                                        data={'name': 'ABC'},
+                                        format='application/json')
+        self.assertEqual(create_state.status_code, 201)
+        create_state = self.client.post(reverse('state_list'),
+                                        data={'name': 'ABC'},
+                                        format='application/json')
+
+        self.assertEqual(create_state.status_code, status.HTTP_409_CONFLICT)
+
 
 class UpdateSingleStateTest(TestCase):
     """ Test module for updating an existing state record """
@@ -78,11 +102,18 @@ class UpdateSingleStateTest(TestCase):
     def setUp(self):
         self.state1 = State.objects.create(name='Rajasthan')
         self.state2 = State.objects.create(name='Punjab')
+        self.state3 = State.objects.create(name='Bihar')
         self.valid_payload = {
             'name': 'Rajasthan'
         }
         self.invalid_payload = {
             'name': '',
+        }
+        self.invalid_payload1 = {
+            'name': "123",
+        }
+        self.invalid_payload2 = {
+            'name': 'Punjab'
         }
 
     def test_valid_update_state(self):
@@ -99,6 +130,20 @@ class UpdateSingleStateTest(TestCase):
             data=json.dumps(self.invalid_payload),
             content_type='application/json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_update_invalid_state_name(self):
+        response = client.put(reverse('state_detail', kwargs={'pk': self.state3.pk}),
+                              data=json.dumps(self.invalid_payload1),
+                              content_type='application/json'
+                              )
+        self.assertEqual(response.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
+
+    def test_if_multiple_state_name(self):
+        response = client.put(reverse('state_detail', kwargs={'pk': self.state3.pk}),
+                              data=json.dumps(self.invalid_payload2),
+                              content_type='application/json'
+                              )
+        self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
 
 
 class DeleteSingleStateTest(TestCase):

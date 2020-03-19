@@ -10,8 +10,8 @@ class StateTestCase(TestCase):
         State.objects.create(name='Gujarat')
 
     def test_state_count(self):
-        state = State.objects.all()
-        self.assertEqual(state.count(), 2)
+        count = State.objects.all()
+        self.assertEqual(count.count(), 2)
 
     def test_name_max_length(self):
         state = State.objects.get(id=1)
@@ -23,11 +23,5 @@ class StateTestCase(TestCase):
         with self.assertRaises(ValidationError):
             name.full_clean()
 
-
-
-
-
-
-
-
-
+    def test_name_single_entry(self):
+        self.assertEqual(1, len(State.objects.filter(name='Gujarat')))
