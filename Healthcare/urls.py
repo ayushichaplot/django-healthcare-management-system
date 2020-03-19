@@ -18,7 +18,6 @@ from django.urls import path
 from django.conf.urls import url
 from healthcare_app.views import views_state
 
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     url(
@@ -31,5 +30,6 @@ urlpatterns = [
         views_state.state_detail,
         name='state_detail'
     ),
+
 
 ]
