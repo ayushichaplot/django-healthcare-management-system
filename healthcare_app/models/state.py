@@ -13,6 +13,7 @@ class State(models.Model):
     name = models.CharField(validators=[name_regex], max_length=100, unique=True)
 
     def clean(self):
+        self.clean_fields()
         self.name = self.name.capitalize()
 
     def __str__(self):

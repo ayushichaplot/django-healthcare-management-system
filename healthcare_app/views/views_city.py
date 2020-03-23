@@ -36,6 +36,8 @@ def city_list(request):
         except ValidationError as e:
             if e.detail.get('name') == ['city with this name already exists.']:
                 raise Custom409()
+            if e.detail.get('postalcode') == ['city with this postalcode already exists.']:
+                raise Custom409()
             elif e.detail.get('name') == ['Name should only consist of characters']:
                 raise Custom422()
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -75,6 +77,8 @@ def city_detail(request, id):
         except ValidationError as e:
             if e.detail.get('name') == ['city with this name already exists.']:
                 raise Custom409()
+            if e.detail.get('postalcode') == ['city with this postalcode already exists.']:
+                raise Custom409()
             elif e.detail.get('name') == ['Name should only consist of characters']:
                 raise Custom422()
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -89,6 +93,8 @@ def city_detail(request, id):
                     return Response(serializer.data, status=status.HTTP_201_CREATED)
             except ValidationError as e:
                 if e.detail.get('name') == ['city with this name already exists.']:
+                    raise Custom409()
+                if e.detail.get('postalcode') == ['city with this postalcode already exists.']:
                     raise Custom409()
                 elif e.detail.get('name') == ['Name should only consist of characters']:
                     raise Custom422()

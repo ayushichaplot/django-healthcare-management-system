@@ -34,7 +34,7 @@ class GetSingleStateTest(TestCase):
         self.state1 = State.objects.create(name='Rajasthan')
         self.state2 = State.objects.create(name='Punjab')
 
-    def test_get_valid_single_patient(self):
+    def test_get_valid_single_state(self):
         response = client.get(reverse('state_detail', kwargs={'pk': self.state1.pk}))
         state = State.objects.get(pk=self.state1.pk)
         serializer = StateSerializer(state)
