@@ -16,7 +16,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.conf.urls import url
-from healthcare_app.views import views_state
+from healthcare_app.views import views_state, views_city
+#from ..healthcare_app.views import views_city, views_state
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -31,5 +32,14 @@ urlpatterns = [
         name='state_detail'
     ),
 
-
+    url(
+        r'^api/v1/cities/$',
+        views_city.city_list,
+        name='city_list'
+    ),
+    url(
+        r'^api/v1/cities/(?P<id>[0-9]+)$',
+        views_city.city_detail,
+        name='city_detail'
+    ),
 ]
