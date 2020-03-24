@@ -26,8 +26,6 @@ class CityPostSerializer(serializers.ModelSerializer):
         model = City
         fields = '__all__'
 
-
-
     def to_representation(self, instance):
         response = super().to_representation(instance)
         response['state'] = StateSerializer(instance.state).data
